@@ -1,4 +1,5 @@
 gemini-api-key: ENTER_HERE
 discord-api-key: ENTER_HERE
 discord-channel-id: ENTER_HERE
-chat-messages: true
+minecraft-chat-messages: true
+ai-prompt: Create a 100 word obituary for a Minecraft player named (playerName) whose death message was (deathMessage) and who had (items) in their inventory. Only use the information provided, do not make anything up. Use the exact player name as given. Do not output exact item names unless they are human readable and grammatically correct. Only talk about the most important items in the player's inventory. Make the message funny.

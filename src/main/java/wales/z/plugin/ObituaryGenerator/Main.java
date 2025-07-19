@@ -60,9 +60,29 @@ public class Main extends JavaPlugin implements Listener {
 
 		String items = inventoryString.toString();
 		
+		
+		String customPrompt = getConfig().getString("ai-prompt");
+		String[] words = customPrompt.split("\\s+");
+		
+		for (int i = 0; i < words.length; i++) {
+			switch (words[i]) {
+			case "(playerName)":
+				words[i] = playerName;
+				break;
+			case "(deathMessage)":
+				words[i] = deathMessage;
+				break;
+			case "(items)":
+				words[i] = items;
+				break;
+			}
+		}
+		
+		String finalPrompt = String.join(" ", words);
+		
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
 			try {
-				String obit = Requestor.requestObit("Create a 100 word obituary for a minecraft player named " + playerName + " whose death message was " + deathMessage + " and who had " + items + " in their inventory. DO NOT make anything up. Use the exact player name, don't try to correct it. Use the information provided. Do not output the exact item name, but make it human readable and grammatically correct. Only cover the relevant items. Make the message funny.", getConfig().getString("gemini-api-key"));
+				String obit = Requestor.requestObit(finalPrompt, getConfig().getString("gemini-api-key"));
 				return obit;
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -74,11 +94,12 @@ public class Main extends JavaPlugin implements Listener {
         
         future.thenAccept(response -> {
         	Bukkit.getScheduler().runTask(this, () -> {
+        		String cleanedResponse = response.replaceAll("(\\r?\\n)[ \\t\\r]*$", "");
         		if (getConfig().getBoolean("minecraft-chat-messages")) {
-        			Bukkit.broadcastMessage(response);
+        			Bukkit.broadcastMessage(cleanedResponse);
         		}
             	if (discordOn) {
-            		String errorReply = Requestor.sendMessage(response, getConfig().getString("discord-channel-id"), getConfig().getString("discord-api-key"));
+            		String errorReply = Requestor.sendMessage(cleanedResponse, getConfig().getString("discord-channel-id"), getConfig().getString("discord-api-key"));
             		if (!(errorReply == null)) {
             			getLogger().info(errorReply);
             		}
