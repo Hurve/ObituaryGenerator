@@ -1,0 +1,3 @@
+main: wales.z.plugin.ObituaryGenerator.Main
+name: ObituaryGenerator
+version: 1
