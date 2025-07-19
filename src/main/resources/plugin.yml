@@ -1,3 +1,6 @@
 main: wales.z.plugin.ObituaryGenerator.Main
 name: ObituaryGenerator
-version: 1
+version: 1.1
+description: AI-Generated funny obituaries whenever a player dies both in Discord and chat!
+api-version: '1.20'
+author: hurve

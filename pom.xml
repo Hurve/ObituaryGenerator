@@ -29,12 +29,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JDA -->
-        <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.20</version>
-        </dependency>
+
 
         <!-- Gson -->
         <dependency>
@@ -68,11 +63,6 @@
                         <goals><goal>shade</goal></goals>
                         <configuration>
                             <relocations>
-                                <!-- Relocate JDA packages -->
-                                <relocation>
-                                    <pattern>net.dv8tion</pattern>
-                                    <shadedPattern>wales.z.plugin.shaded.net.dv8tion</shadedPattern>
-                                </relocation>
                                 <!-- Relocate Gson packages -->
                                 <relocation>
                                     <pattern>com.google.gson</pattern>

@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletionException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -75,5 +76,29 @@ public class Requestor {
 
 	    return firstPart.get("text").getAsString();
 		
+	}
+	
+	public static String sendMessage(String message, String channelID, String apiKey) {
+		JsonObject payload = new JsonObject();
+		
+		payload.addProperty("content", message);
+		
+		HttpRequest request = HttpRequest.newBuilder()
+				.uri(URI.create("https://discord.com/api/v10/channels/" + channelID + "/messages"))
+				.header("Authorization", "Bot " + apiKey)
+				.header("Content-Type", "application/json")
+				.POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+				.build();
+		
+		HttpClient client = HttpClient.newHttpClient();
+		
+	    try {
+	        client.sendAsync(request, HttpResponse.BodyHandlers.discarding())
+	              .join();
+	        return null;
+	    } catch (CompletionException e) {
+	        return e.getCause().getMessage();
+	    }
+	    
 	}
 }

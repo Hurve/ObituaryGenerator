@@ -8,17 +8,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.concurrent.CompletableFuture;
 
 
 public class Main extends JavaPlugin implements Listener {
 	
-	private JDA api;
-	private TextChannel channel;
+
 	private Boolean discordOn = false;
 	
 	@Override
@@ -36,7 +32,6 @@ public class Main extends JavaPlugin implements Listener {
         } else if (getConfig().getString("discord-channel-id").equals("ENTER_HERE")) {
         	getLogger().info("You have not specified a Discord Channel ID. Your messages will not send successfully.");
         } else if (!(getConfig().getString("discord-channel-id").equals("ENTER_HERE") && getConfig().getString("discord-api-key").equals("ENTER_HERE"))){
-        	api = JDABuilder.createDefault(getConfig().getString("discord-api-key")).build();
         	discordOn = true;
         }
         
@@ -44,22 +39,13 @@ public class Main extends JavaPlugin implements Listener {
         
 	}
 	
-	@Override
-	public void onDisable() {	
-		if (api != null) {
-			api.shutdownNow();
-		}
-	}
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent pde) {
 		
 		String deathMessage = pde.getDeathMessage();
 		String playerName = pde.getEntity().getName();
 		
-		if (channel == null && !(getConfig().getString("discord-channel-id").equals("ENTER_HERE") && getConfig().getString("discord-api-key").equals("ENTER_HERE"))) {
-			channel = api.getTextChannelById(getConfig().getString("discord-channel-id"));
-
-		}
 		
 		StringBuilder inventoryString = new StringBuilder();
 
@@ -88,9 +74,14 @@ public class Main extends JavaPlugin implements Listener {
         
         future.thenAccept(response -> {
         	Bukkit.getScheduler().runTask(this, () -> {
-            	Bukkit.broadcastMessage(response);
+        		if (getConfig().getBoolean("minecraft-chat-messages")) {
+        			Bukkit.broadcastMessage(response);
+        		}
             	if (discordOn) {
-            		channel.sendMessage(response).queue();	
+            		String errorReply = Requestor.sendMessage(response, getConfig().getString("discord-channel-id"), getConfig().getString("discord-api-key"));
+            		if (!(errorReply == null)) {
+            			getLogger().info(errorReply);
+            		}
             	}
         	});
         });

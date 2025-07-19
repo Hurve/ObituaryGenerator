@@ -1,3 +1,4 @@
 gemini-api-key: ENTER_HERE
 discord-api-key: ENTER_HERE
 discord-channel-id: ENTER_HERE
+chat-messages: true
